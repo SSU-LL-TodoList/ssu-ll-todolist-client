@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import Login from './login.jsx'
 import Second from './second.jsx'
 
+const MEMBER_ID_STORAGE_KEY = 'todoMemberId'
+
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [memberId, setMemberId] = useState(() => sessionStorage.getItem(MEMBER_ID_STORAGE_KEY))
   const [path, setPath] = useState(window.location.pathname)
 
   useEffect(() => {
@@ -23,18 +25,20 @@ export default function App() {
     setPath(nextPath)
   }
 
-  const handleLoginSuccess = () => {
-    setIsLoggedIn(true)
+  const handleLoginSuccess = (nextMemberId) => {
+    sessionStorage.setItem(MEMBER_ID_STORAGE_KEY, nextMemberId)
+    setMemberId(nextMemberId)
     movePath('/main')
   }
 
   const handleLogout = () => {
-    setIsLoggedIn(false)
+    sessionStorage.removeItem(MEMBER_ID_STORAGE_KEY)
+    setMemberId(null)
     movePath('/')
   }
 
-  if (isLoggedIn && path === '/main') {
-    return <Second onLogout={handleLogout} />
+  if (memberId && path === '/main') {
+    return <Second memberId={memberId} onLogout={handleLogout} />
   }
 
   return <Login onLoginSuccess={handleLoginSuccess} />
